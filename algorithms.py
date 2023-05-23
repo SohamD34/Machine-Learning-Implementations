@@ -156,3 +156,54 @@ class KMeans:
   #________________________________________________________________#
   
   
+def PCA(X,N):
+
+      cov_mat = covariance_matrix(X)
+
+      eigen_vectors = np.linalg.eigh(cov_mat)[1]
+      evec = eigen_vectors
+      eigen_values = np.linalg.eigh(cov_mat)[0]
+      ev = eigen_values
+
+      sorted_index = np.argsort(ev)[::-1]
+      sorted_eigenvalue = ev[sorted_index]
+      sorted_eigenvectors = evec[:,sorted_index]
+      sorted_titles = X.columns.values[sorted_index]
+
+      eigenvector_subset = sorted_eigenvectors[:,0:N]
+      titles_subset = sorted_titles[0:N]
+
+      X_reduced = np.dot(eigenvector_subset.transpose() , X.transpose()).transpose()
+      X_reduced = pd.DataFrame(X_reduced, columns = titles_subset)
+
+      return X_reduced,evec,ev
+
+    
+  def PCA_Gaussian(X,N):
+
+      mat = covariance_matrix(X)
+      cov_mat = mat.copy()
+      for i in range(len(cov_mat)):
+          for j in range(len(cov_mat[0])):
+              if i!=j:
+                  cov_mat[i][j] = 0
+
+      eigen_vectors = np.linalg.eigh(cov_mat)[1]
+      evec = eigen_vectors
+      eigen_values = np.linalg.eigh(cov_mat)[0]
+      ev = eigen_values
+
+      sorted_index = np.argsort(ev)[::-1]
+      sorted_eigenvalue = ev[sorted_index]
+      sorted_eigenvectors = evec[:,sorted_index]
+      sorted_titles = X.columns.values[sorted_index]
+
+      eigenvector_subset = sorted_eigenvectors[:,0:N]
+      titles_subset = sorted_titles[0:N]
+
+      X_reduced = np.dot(eigenvector_subset.transpose() , X.transpose()).transpose()
+      X_reduced = pd.DataFrame(X_reduced, columns = titles_subset)
+
+      return X_reduced,evec,ev
+
+    #_____________________________________#
