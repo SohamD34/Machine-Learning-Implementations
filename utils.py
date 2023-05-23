@@ -67,3 +67,14 @@ def cont_to_cat(X, y, feature):
     X_categorised = np.digitize(X[:, feature], bins) - 1          # assigning labels to all optimal split points
     return X_categorised, bins
 
+
+def covariance(x,y):
+    x_mean = sum(x)/len(x)
+    y_mean = sum(y)/len(y)
+    sum1 = 0
+    for i in range(len(x)):
+        x_diff = x[i] - x_mean
+        y_diff = y[i] - y_mean
+        prod = x_diff*y_diff
+        sum1 += prod
+    return sum1/((len(x))-1)
