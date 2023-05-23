@@ -9,3 +9,9 @@ Contains scratch implementations of some popular Machine Learning algorithms in 
 5. Linear Discriminant Analysis (LDA)
 6. Bidirectional Feature Selection 
 7. Multilayer Perceptron (MLP) - Forward propagation, Backward propagation
+
+## Error Functions
+1. Mean squared error
+2. Mean absolute error
+
+## Distance 
