@@ -78,3 +78,11 @@ def covariance(x,y):
         prod = x_diff*y_diff
         sum1 += prod
     return sum1/((len(x))-1)
+
+
+def Mahalanobis(x, y, cov_mat):
+    xx=x-y
+    cov_inv=np.linalg.inv(cov_mat)
+    mah=np.matmul(np.matmul(xx.T,cov_inv),xx)
+    mah_d=mah**0.5
+    return mah_d
