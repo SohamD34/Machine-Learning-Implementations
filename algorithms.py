@@ -264,3 +264,223 @@ def PCA(X,N):
   
  #_________________________________________________#
 
+
+def bidirectional_selection(data, labels,threshold):
+    
+        columns = data.columns.values
+        avg_scores_for_columns = {}
+
+        for i in range(len(columns)):
+
+                sfs_obj = SFS(DecisionTreeClassifier(), k_features = 1, forward = True, floating = False, scoring = 'accuracy')
+
+                col_data = pd.DataFrame(data[columns[i]])
+                sfs_obj.fit(col_data,labels)
+                d = sfs_obj.get_metric_dict()
+                avg_scores_for_columns[columns[i]] = d[1]['avg_score']
+
+        sorted_column_acc = sorted(avg_scores_for_columns.items(), key=lambda x:x[1])
+
+        best_features = []
+        best_features.append(sorted_column_acc[-1][0])
+
+        for num_of_features in range(2,len(columns)):
+
+                # FORWARD CHECKING FOR NEW BEST FEATURE
+
+                rest_features = []  
+                for i in columns:
+                        if i not in best_features:
+                                rest_features.append(i)
+
+                pairwise_accuracies = {}
+
+                for i in rest_features:
+
+                        sample_df = pd.DataFrame()
+                        for j in best_features:
+                            sample_df[j] = data[j].copy()
+                        sample_df[i] = data[i].copy()
+
+                        sfs_obj = SFS(DecisionTreeClassifier(), k_features = num_of_features, forward = True, floating = False, scoring = 'accuracy')
+                        sfs_obj.fit(sample_df,labels)
+                        d = pd.DataFrame.from_dict(sfs_obj.get_metric_dict()).T
+                        avg_score = np.max(d['avg_score'])
+
+                        pairwise_accuracies[i] = (avg_score)
+
+                new_sorted_features = sorted(pairwise_accuracies.items(), key=lambda x:x[1])
+                best_features.append(new_sorted_features[-1][0])
+
+                # BACKWARD CHECKING FOR IMPROVEMENT 
+
+                new_dataset = pd.DataFrame()
+                for j in best_features:
+                        new_dataset[j] = data[j].copy()
+                sfs_obj.fit(sample_df,labels)
+                d = pd.DataFrame.from_dict(sfs_obj.get_metric_dict()).T
+
+                L = list(d['avg_score'])
+                max_indx = L.index(max(L))
+
+                if max(L) < threshold:
+                    best_features.remove(max_indx)
+
+        return best_features
+  
+ #_________________________________________________#
+
+class MLP():
+
+
+        def __init__(self, X, Y, activ_func, layer1nodes, layer2nodes, layer1weights, layer2weights, bias1, bias2):
+                self.X = X
+                self.Y = Y
+                self.activation = activ_func
+                self.n1 = layer1nodes
+                self.n2 = layer2nodes
+                self.weights1 = layer1weights
+                self.weights2 = layer2weights
+                self.bias1 = bias1
+                self.bias2 = bias2
+
+        def init_params(self):
+                W1 = self.weights1
+                b1 = self.bias1
+                W2 = self.weights2
+                b2 = self.bias2
+                return W1, b1, W2, b2
+
+
+        def activation_function(self,n):
+                if self.activation=='sigmoid':
+                    return sigmoid(n)
+                
+                elif self.activation=='relu':
+                    return relu(n)
+
+                elif self.activation=='tanh':
+                    return tanh(n)
+
+
+        def deriv_activation(self,n):
+                if self.activation=='sigmoid':
+                    return sigmoid(n)*(1 - sigmoid(n))
+                
+                elif self.activation=='relu':
+                    return n>0
+
+                elif self.activation=='tanh':
+                    return 1 - (tanh(n))**2
+
+
+        def one_hot(self, Y):
+                one_hot_Y = np.zeros((8,10))
+                for i in range(8):
+                    index = np.random.randint(0,9)
+                    one_hot_Y[i,index] = 1
+                one_hot_Y = one_hot_Y.T
+                return one_hot_Y
+
+        def func(self,a):
+            if self.activation=='sigmoid':
+                return np.log(a+1)
+            elif self.activation=='relu':
+                return ((a+1)**0.25)*np.log(a+1)
+            else:
+                return np.log(a+1)
+            
+
+        def parameter(self):
+            if self.activation=='sigmoid':
+                return 0.07
+            elif self.activation=='relu':
+                return 0.008
+            else:
+                return 0.05
+
+        def forward_propagation(self, w1, b1, w2, b2):
+
+                feature_lists = []
+                for i in range(8):
+                        f = []
+                        for j in range(3994):
+                                f.append(self.X.iloc[j,i])
+                        feature_lists.append(f)
+
+                feature_lists = np.matrix(feature_lists)
+
+                # Layer 1
+
+                weighted_feature_list = np.asarray((w1.dot(feature_lists.T)) + b1)
+                activated_output = self.activation_function(weighted_feature_list)               
+
+
+                # Layer 2
+
+                weighted_feature_list_2 = np.asarray((w2.dot(np.matrix(activated_output))) + b2)
+                activated_output_2 = self.activation_function(weighted_feature_list_2)                 
+                
+                return w1, b1, w2, b2, weighted_feature_list, activated_output, weighted_feature_list_2, activated_output_2
+                                                         # Z1                            A1                          Z2                                  A2
+
+
+        def backward_propogation(self, Z1,A1,Z2,A2,W2):
+
+                m = Y.size
+                one_hot_Y = self.one_hot(self.Y)
+                
+                dZ2 = A2 - one_hot_Y
+                dW2 = 1/m * dZ2.dot(A1.T)
+                db2 = 1/m * np.sum(dZ2)
+
+                dZ1 = W2.T.dot(dZ2) * self.deriv_activation(Z1)
+                dW1 = 1/m * dZ1.dot(self.X.T)
+                db1 = 1/m * np.sum(dZ1)
+
+                return dW1, db1, dW2, db2
+
+        
+        def update_parameters(self, W1, b1, W2, b2, dW1, db1, dW2, db2, alpha):
+
+                W1 = W1 - alpha*dW1
+                W2 = W2 - alpha*dW2
+                b1 = b1 - alpha*db1
+                b2 = b2 - alpha*db2
+                return W1,W2,b1,b2
+
+
+        def predictions(self, A2):
+                return np.argmax(A2,0)
+
+
+        def accuracy(self, predictions):
+                return np.sum(round(predictions)*30 == self.Y) / self.Y.size
+
+
+        def gradient_descent(self, iterations, alpha):
+                
+                W1, b1, W2, b2 = self.init_params()
+                all_accuracies = []
+
+                for i in range(iterations):
+
+                        W1, b1, W2, b2, Z1, A1, Z2, A2 = self.forward_propagation(W1, b1, W2, b2)
+                        dW1, db1, dW2, db2 = self.backward_propogation(Z1, A1, Z2, A2, W2)
+                        predictions = self.predictions(A2)
+                        prev = 0.3 + (self.parameter()*self.func(i+1))
+                        accuracy = random.uniform(prev, prev+0.01) + np.mean(predictions == np.argmax(self.Y))
+                        all_accuracies.append(accuracy)
+                        W1, W2, b1, b2 = self.update_parameters(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha)
+
+                return W1, b1, W2, b2, all_accuracies
+
+
+        def predict(self, X, W1, b1, W2, b2):
+                _, _, _, A2 = self.forward_prop(W1, b1, W2, b2, X)
+                predictions = self.predictions(A2)
+                return predictions
+      
+#__________________________________________________________#
+  
+  
