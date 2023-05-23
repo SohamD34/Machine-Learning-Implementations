@@ -207,3 +207,60 @@ def PCA(X,N):
       return X_reduced,evec,ev
 
     #_____________________________________#
+
+  
+ def LDA(df, N):
+
+    L = utils.split_class_wise(df)
+
+    class_sizes = []
+    for i in range(3):
+        class_sizes.append(len(L[i]))
+
+    class_wise_means = []
+    for i in range(3):
+        class_wise_means.append(utils.within_class_means(L[i]))
+
+    within_means = pd.DataFrame(class_wise_means,columns = df.columns.values)
+    m = utils.overall_mean(df)
+
+    class_1 = pd.DataFrame(L[0],columns=df.columns.values)
+    class_2 = pd.DataFrame(L[1],columns=df.columns.values)
+    class_3 = pd.DataFrame(L[2],columns=df.columns.values)
+    m1 = utils.within_class_scatter_matrix(within_means.iloc[0,:],class_1)
+    m2 = utils.within_class_scatter_matrix(within_means.iloc[1,:],class_2)
+    m3 = utils.within_class_scatter_matrix(within_means.iloc[2,:],class_3)
+
+    within_class_matrix = m1 + m2 + m3
+    between_class_matrix = utils.between_class_scatter_matrix(class_wise_means, m, class_sizes)
+    eigen_values, eigen_vectors = np.linalg.eig(np.linalg.inv(within_class_matrix).dot(between_class_matrix))
+    
+    variances = []
+    for i in eigen_values:
+        s = np.sum(eigen_values)
+        variances.append(i/s)
+
+    threshold = 10**(-10)
+
+    if N==None:
+        N = 0
+        for i in variances:
+            if i>threshold:
+                N+=1
+
+    pairs = [(np.abs(eigen_values[i]), eigen_vectors[:,i]) for i in range(len(eigen_values))]
+    pairs = sorted(pairs, key=lambda x: x[0], reverse=True)
+    selected_vectors = []
+
+    for i in range(N):
+        selected_vectors.append((np.array(pairs[i][1].reshape(1,-1))[0]))
+
+    orig_data = (df.iloc[:,1:]).to_numpy()
+    new_data = orig_data@(np.array(selected_vectors).T).real
+
+    final_df = pd.DataFrame(new_data)
+
+    return final_df
+  
+ #_________________________________________________#
+
