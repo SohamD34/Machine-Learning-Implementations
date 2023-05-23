@@ -14,4 +14,4 @@ Contains scratch implementations of some popular Machine Learning algorithms in 
 1. Mean squared error
 2. Mean absolute error
 
-## Distance 
+## Utilities
