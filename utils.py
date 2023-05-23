@@ -86,3 +86,70 @@ def Mahalanobis(x, y, cov_mat):
     mah=np.matmul(np.matmul(xx.T,cov_inv),xx)
     mah_d=mah**0.5
     return mah_d
+
+
+def split_class_wise(frame,uniq_classes):
+    class_wise_data = []
+    for i in range(len(uniq_classes):
+        class_data = df[df['Class']==uniq_classes[i]]
+        class_wise_data[i] = (class_data.to_numpy())
+    return class_wise_data
+
+                   
+def within_class_means(class_data):
+    class_data = pd.DataFrame(class_data, columns = df.columns.values)
+    names = class_data.columns.values
+    class_means = []
+    for i in names:
+        attribute_values = class_data[i]
+        attribute_mean = np.mean(attribute_values)
+        class_means.append(attribute_mean)
+    return class_means
+                   
+                   
+def overall_mean(X):
+    col_names = X.columns.values
+    overall_mean_vec = []
+    for i in col_names:
+        L = list(data[i])
+        mean = np.mean(L)
+        overall_mean_vec.append(mean)
+    return overall_mean_vec
+                   
+                   
+def within_class_scatter_matrix(class_mean,class_data):
+
+    mean = np.array(class_mean.drop("Class"))
+    data = class_data.drop("Class",axis=1)
+    scatter_matrix = np.zeros((13,13))
+
+    for i in range(len(data)):
+
+        datapoint = np.array(data.iloc[i,:])
+
+        diff = np.matrix(datapoint - mean)
+        diff_T = diff.T
+
+        point_mat = np.dot(diff.T,diff)
+        scatter_matrix+=point_mat
+
+    return np.matrix(scatter_matrix)
+                   
+                   
+def between_class_scatter_matrix(class_means, df_mean, class_sizes):
+
+    scatter_matrix = np.zeros((13,13))
+
+    for i in range(len(class_sizes)):
+
+        mi = np.array(class_means[i][1:])
+        m = np.array(df_mean)
+        Ni = np.array(class_sizes[i])
+        diff = np.matrix(mi - m)
+        diff_T = diff.T
+        class_mat = Ni*(np.dot(diff_T,diff))
+        scatter_matrix += class_mat
+
+    return np.matrix(scatter_matrix)
+                   
+                   
