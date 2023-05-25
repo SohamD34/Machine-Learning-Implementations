@@ -265,7 +265,7 @@ def PCA(X,N):
  #_________________________________________________#
 
 
-def bidirectional_selection(data, labels,threshold):
+def Bidirectional_Feature_Selection(data, labels,threshold):
     
         columns = data.columns.values
         avg_scores_for_columns = {}
