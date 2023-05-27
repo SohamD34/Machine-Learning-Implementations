@@ -19,7 +19,7 @@ def plot_decision_boundary(X, y, clf, title):
     plt.show()
     
 
- def Gini_Index(L):
+def Gini_Index(L):
     d = {x:L.count(x) for x in L}
     n = len(L)
     p = []
