@@ -483,4 +483,47 @@ class MLP():
       
 #__________________________________________________________#
   
+class LogisticRegression():
+  
+    def sigmoid(self,z):
+        sig = 1/(1+exp(-z))
+        return sig
+      
+    def initialize(self,X):
+        weights = np.zeros((shape(X)[1]+1,1))
+        X = np.c_[np.ones((shape(X)[0],1)),X]
+        return weights,X
+      
+    def gradient_descent(self,X,y,weights,iter)
+          cost_list = np.zeros(iter,)
+          for i in range(iter):
+              weights = weights - alpha*dot(X.T,self.sigmoid(dot(X,weights))-np.reshape(y,(len(y),1)))
+              cost_list[i] = self.cost(weights)
+          return cost_list
+    
+    def cost(self,theta):
+          z = dot(X,theta)
+          cost0 = y.T.dot(log(self.sigmoid(z)))
+          cost1 = (1-y).T.dot(log(1-self.sigmoid(z)))
+          cost = -((cost1 + cost0))/len(y)
+          return cost
+           
+    def fit(self,X,y,alpha=0.001,iter=400):
+          weights,X = self.initialize(X)
+          cost_list = self.gradient_descent(X,y,weights,iter)
+          self.weights = weights
+          return cost_list
+      
+    def predict(self,X):
+        z = dot(self.initialize(X)[1],self.weights)
+        l = []
+        for i in self.sigmoid(z):
+            if i>0.5:
+                l.append(1)
+            else:
+                l.append(0)
+        return l
+      
+  #_____________________________________________________#
+  
   
