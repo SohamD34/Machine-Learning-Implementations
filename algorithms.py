@@ -492,6 +492,7 @@ class LogisticRegression():
         self.weights = np.random.rand(self.features,)
         self.biases = np.random.randn(1)
         self.rate = rate
+        self.probabilities = None
     
     def sigmoid(self, x):
         return 1/(1 + np.exp(-1*x))
@@ -509,13 +510,14 @@ class LogisticRegression():
             db = 1/(len(X))*np.sum(dZ)
             self.weights = self.weights - self.rate*dW
             self.biases = self.biases - self.rate*db
-        print(A)
             
     def predict(self, X_test):
         Z = np.dot(self.weights, self.X.T) + self.biases
         A = self.sigmoid(Z)
-        print(A) #probabilities
+        self.probabilites = A
+        predictions = [round(i) for i in A]
+        return predictions
       
-  #_____________________________________________________#
+#_____________________________________________________#
   
   
