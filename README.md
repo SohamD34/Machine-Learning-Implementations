@@ -10,6 +10,7 @@ Contains scratch implementations of some popular Machine Learning algorithms in 
 6. Bidirectional Feature Selection 
 7. Multilayer Perceptron (MLP) - Forward propagation, Backward propagation
 8. Logistic Regression
+9. Multivariate SGD Regression
 
 ## Error Functions
 1. Mean squared error
