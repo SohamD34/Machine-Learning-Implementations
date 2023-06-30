@@ -519,5 +519,52 @@ class LogisticRegression():
         return predictions
       
 #_____________________________________________________#
-  
+
+class MultivariateSGDRegression:
+    def __init__(self, learning_rate=0.01, max_epochs=1000, batch_size=32):
+        self.learning_rate = learning_rate
+        self.max_epochs = max_epochs
+        self.batch_size = batch_size
+        self.weights = None
+        self.bias = None
+    
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        
+        self.weights = np.zeros(n_features)
+        self.bias = 0.0
+        
+        for epoch in range(self.max_epochs):
+
+            X, y = self._shuffle_data(X, y)
+            
+            for i in range(0, n_samples, self.batch_size):
+                X_batch = X[i:i+self.batch_size]
+                y_batch = y[i:i+self.batch_size]
+
+                gradients = self._compute_gradients(X_batch, y_batch)
+                
+                self.weights -= self.learning_rate * gradients['weights']
+                self.bias -= self.learning_rate * gradients['bias']
+    
+    def predict(self, X):
+        return np.dot(X, self.weights) + self.bias
+    
+    def _compute_gradients(self, X, y):
+        n_samples = X.shape[0]
+        y_pred = self.predict(X)
+        d_weights = (1/n_samples) * np.dot(X.T, (y_pred - y))
+        d_bias = (1/n_samples) * np.sum(y_pred - y)
+        gradients = {
+            'weights': d_weights,
+            'bias': d_bias
+        }
+        return gradients
+    
+    def _shuffle_data(self, X, y):
+        indices = np.arange(X.shape[0])
+        np.random.shuffle(indices)
+        return X[indices], y[indices]
+
+#__________________________________________________________#
   
