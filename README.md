@@ -17,11 +17,12 @@ Contains scratch implementations of some popular Machine Learning algorithms in 
 2. Mean absolute error
 
 ## Utilities
-1. Plot decision boundary
-2. Gini Index
-3. Continuous to Categorical (cont_to_cat)
-4. Covariance
-5. Mahalanobis distance
+1. Gradient Descent
+2. Plot decision boundary
+3. Gini Index
+4. Continuous to Categorical (cont_to_cat)
+5. Covariance
+6. Mahalanobis distance
 
 LDA utitilies - 
 1. split_class_wise
