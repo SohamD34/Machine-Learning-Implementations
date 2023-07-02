@@ -1,3 +1,24 @@
+def gradient_descent(x_train,y_train,model):
+
+    x = tf.placeholder(tf.float32)
+    y = tf.placeholder(tf.float32)
+    w = tf.Variable(0.5, name="weights")
+
+    #  model = tf.add(tf.multiply(x, w), 0.5)         # x*w + 0.5
+    
+    cost = tf.reduce_mean(tf.square(model - y))
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
+    train = optimizer.minimize(cost)
+
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        for i in range(1000):
+            sess.run(train,feed_dict={x:x_train, y:y_train})
+        w_val = sess.run(w)
+
+    return w_val
+    
+
 def plot_decision_boundary(X, y, clf, title):
 
     h = 0.02 
