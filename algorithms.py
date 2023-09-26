@@ -5,7 +5,10 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sb
 import math
-
+from error_functions.py import MSE
+from error_functions.py import mean_abs_error
+from error_functions.py import L1_regularisation
+from error_functions.py import L2_regularisation
 #_________________________________________________________#
 
 class GaussianNaiveBayes:
