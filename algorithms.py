@@ -10,6 +10,11 @@ from error_functions.py import MSE
 from error_functions.py import mean_abs_error
 from error_functions.py import L1_regularisation
 from error_functions.py import L2_regularisation
+from utils.py import split_class_wise
+from utils.py import within_class_means
+from utils.py import overall_mean
+from utils.py import within_class_scatter_matrix
+from utils.py import between_class_scatter_matrix
 #_________________________________________________________#
 
 class GaussianNaiveBayes:
