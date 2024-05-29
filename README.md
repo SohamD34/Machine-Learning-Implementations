@@ -1,5 +1,5 @@
 # Machine-Learning
-Contains scratch implementations of some popular Machine Learning algorithms in Python
+Contains scratch implementations of some popular Machine Learning and Deep Learning algorithms in Python
 
 ## Algorithms included 
 1. Gaussian Naive Bayes
